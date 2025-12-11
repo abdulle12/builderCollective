@@ -1,9 +1,35 @@
-import  { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
-  User, Briefcase,  ArrowRight, Menu, X, 
-  Code, Rocket, Zap, Target,  CheckCircle, AlertCircle,
+  User, Briefcase, ArrowRight, Menu, X, 
+  Code, Rocket, Zap, Target, CheckCircle, AlertCircle,
   Mail, Phone, Lightbulb, 
 } from 'lucide-react';
+
+interface FormData {
+  fullName: string;
+  email: string;
+  phone: string;
+  role: string;
+  skills: string;
+  projectDescription: string;
+}
+
+interface FormErrors {
+  fullName?: string;
+  email?: string;
+  phone?: string;
+  role?: string;
+  skills?: string;
+  projectDescription?: string;
+}
+
+interface LandingPageProps {
+  onEnter: () => void;
+}
+
+interface RegistrationFormProps {
+  onBack: () => void;
+}
 
 const BuildersCollective = () => {
   const [currentView, setCurrentView] = useState('landing'); 
@@ -25,7 +51,7 @@ const BuildersCollective = () => {
 };
 
 // --- LANDING PAGE COMPONENT ---
-const LandingPage = ({ onEnter }) => {
+const LandingPage = ({ onEnter }: LandingPageProps) => {
   const [mobileMenu, setMobileMenu] = useState(false);
 
   return (
@@ -216,8 +242,8 @@ const LandingPage = ({ onEnter }) => {
 };
 
 // --- REGISTRATION FORM COMPONENT ---
-const RegistrationForm = ({ onBack }) => {
-  const [formData, setFormData] = useState({
+const RegistrationForm = ({ onBack }: RegistrationFormProps) => {
+  const [formData, setFormData] = useState<FormData>({
     fullName: '',
     email: '',
     phone: '',
@@ -227,21 +253,21 @@ const RegistrationForm = ({ onBack }) => {
   });
   
   const [submitted, setSubmitted] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<FormErrors>({});
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
-    if (errors[name]) {
+    if (errors[name as keyof FormErrors]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
   const validateForm = () => {
-    const newErrors = {};
+    const newErrors: FormErrors = {};
     
     if (!formData.fullName.trim()) newErrors.fullName = 'Name is required';
     if (!formData.email.trim()) newErrors.email = 'Email is required';
