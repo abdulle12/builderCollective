@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 import { 
   User, Briefcase, ArrowRight, Menu, X, 
   Code, Rocket, Zap, Target, CheckCircle, AlertCircle,
@@ -287,23 +288,38 @@ const RegistrationForm = ({ onBack }: RegistrationFormProps) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
-    if (validateForm()) {
-      console.log('Form submitted:', formData);
-      setSubmitted(true);
-      
-      setTimeout(() => {
-        setSubmitted(false);
-        setFormData({
-          fullName: '',
-          email: '',
-          phone: '',
-          role: '',
-          skills: '',
-          projectDescription: ''
-        });
-      }, 5000);
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+
+    const { error } = await supabase.from("beta_users").insert([
+      {
+        full_name: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        role: formData.role,
+        skills: formData.skills,
+        project_description: formData.projectDescription,
+      },
+    ]);
+
+    if (error) {
+      console.error(error);
+      alert("Submission failed. Please try again.");
+      return;
     }
+
+    // Reset form immediately
+    setFormData({
+      fullName: '',
+      email: '',
+      phone: '',
+      role: '',
+      skills: '',
+      projectDescription: ''
+    });
+    
+    // Show success view (Removed the redirect timer)
+    setSubmitted(true);
   };
 
   if (submitted) {
@@ -314,15 +330,23 @@ const RegistrationForm = ({ onBack }: RegistrationFormProps) => {
             <CheckCircle size={40} className="text-black" />
           </div>
           <h2 className="text-3xl font-bold mb-4">Welcome to the Collective!</h2>
-          <p className="text-slate-400 mb-6 text-lg">
+          <p className="text-slate-400 mb-8 text-lg">
             Your registration has been received. We'll review your application and get back to you within 48 hours.
           </p>
-          <button 
-            onClick={onBack}
-            className="px-6 py-3 bg-yellow-400 text-black font-bold rounded-lg hover:bg-yellow-300 transition-all"
-          >
-            Back to Home
-          </button>
+          <div className="flex flex-col gap-4">
+            <button 
+              onClick={onBack}
+              className="px-6 py-3 bg-yellow-400 text-black font-bold rounded-lg hover:bg-yellow-300 transition-all"
+            >
+              Back to Home
+            </button>
+            <button 
+              onClick={() => setSubmitted(false)}
+              className="text-slate-400 hover:text-white text-sm transition-colors"
+            >
+              Submit another response
+            </button>
+          </div>
         </div>
       </div>
     );

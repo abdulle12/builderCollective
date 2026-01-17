@@ -1,16 +1,11 @@
-
-
-import BuildersCollective from "./components/test"
-
+import { supabase } from "./lib/supabase";
+import BuildersCollective from "./components/test";
 function App() {
-  
 
-  return (
-    
-    <BuildersCollective />
-        
-    
-  )
+  console.log(supabase); // ✅ Put here
+  return <BuildersCollective />;
+
+
 }
 
-export default App
+export default App;
